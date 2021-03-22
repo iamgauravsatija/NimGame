@@ -69,7 +69,7 @@ def player_turn():
 
 def check_win(k,objectPiles):
     #TODO put each section in separate method :)
-    print("hmm someone won")
+    
     allEmpty = True
     #the first section is for the condition "all piles are empty"
     for i in range(len(objectPiles)):
