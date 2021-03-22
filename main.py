@@ -23,16 +23,16 @@ def main():
             display_pile(piles)
             toRemove = player_turn()
             piles = remove_object(piles,toRemove[0],toRemove[1])
-            check_win(k,piles)
+            check_win("P1",k,piles)
             enemy_turn(piles)
-            check_win(k,piles)
+            check_win("P2",k,piles)
         else:
             enemy_turn(piles)
-            check_win(k,piles)
+            check_win("P2",k,piles)
             display_pile(piles)
-            piles = toRemove = player_turn()
+            toRemove = player_turn()
             piles = remove_object(piles,toRemove[0],toRemove[1])
-            check_win(k,piles)
+            check_win("P1",k,piles)
 
 def display_pile(piles):
     print("Displaying the Pile")
@@ -42,9 +42,8 @@ def display_pile(piles):
 
 
 def remove_object(piles,pileNumber,numItems):
-    piles[pileNumber-1] = piles[pileNumber-1]-1
+    piles[pileNumber-1] = piles[pileNumber-1]-numItems
     return piles
-
 
 def choose_start():
     number = random.randint(0,1)
@@ -55,28 +54,27 @@ def choose_start():
     return returnBool
 
 def enemy_turn(piles):
+    x = 1
     #ai stuff goes here
-    print("ai stuff")
     #enemy_turn should return the same thing as player_turn
 
 def player_turn():
-    print("player does something")
     pileNumber = int(input("Enter a pile to remove items from "))
     numItems = int(input("Enter number of items to remove "))
     returnList = [pileNumber,numItems]
     return returnList
 
 
-def check_win(k,objectPiles):
+def check_win(playerName,k,objectPiles):
     #TODO put each section in separate method :)
-    
+
     allEmpty = True
     #the first section is for the condition "all piles are empty"
     for i in range(len(objectPiles)):
         if objectPiles[i] != 0:
             allEmpty = False
     if(allEmpty):
-        print("someone won from this condition")
+        print(playerName + " lost the game")
     #the second section is for the condition "3 piles each with 2 objects and all other piles are empty"
     emptyPilesCounter = 0
     emptyPilesLimit = len(objectPiles)-3
@@ -88,7 +86,7 @@ def check_win(k,objectPiles):
         if objectPiles[i] == 2:
             pilesTwoObjCounter+=1
     if(emptyPilesCounter == emptyPilesLimit and pilesTwoObjLimit == pilesTwoObjCounter):
-        print("someone won from this condition")
+        print(playerName + " lost the game")
     #the third section is for the condition "1 pile with 1 object, 1 pile with 2 objects, 1 pile with 3 objects, all other piles are empty"
     oneObjectPileCounter = 0
     twoObjectPileCounter = 0
@@ -106,59 +104,30 @@ def check_win(k,objectPiles):
             zeroObjectPileCounter+=1
 
     if oneObjectPileCounter ==1 and twoObjectPileCounter==1 and threeObjectPileCounter==1 and zeroObjectPileCounter==zeroObjectPileLimit:
-        print("someoen won from this condition ")
-    #the fourth section os for the condition "2 piles each with 1 object, 2 piles each with 2 objects, the others are empty"
+        print(playerName + " lost the game")
+    #the fourth section os for the condition "2 piles each with 1 object, 2 piles each with 2 objects, the others are empty, this is the general case and has been tested for k=2 and k=3"
     kPilesValue = []
     kPilesCounter = []
     for i in range(int(k)):
         kPilesValue.append(int(i)+1)
         kPilesCounter.append(0)
     objectPileCounter = 0
-    objectPileBool = False
-    rememberedIndex = 0
-    print(kPilesValue)
     zeroObjectPileCounter = 0
     zeroObjectPileLimit = len(objectPiles) - (k*k)
-    print("certainly attempted this doubtless")
     for i in range(len(objectPiles)):
         for j in range(len(kPilesValue)):
             if objectPiles[i] == kPilesValue[j]:
-                print("its true)")
                 kPilesCounter[j] = kPilesCounter[j]+1
                 objectPileCounter += 1
-                objectPileBool = True
-                rememberedIndex = j
         if objectPiles[i] == 0:
             zeroObjectPileCounter += 1
-        # if(objectPileBool):
-        #     kPilesValue.remove(rememberedIndex)
     currentBool = True
     for i in range(len(kPilesValue)):
-        if(kPilesCounter[i]==k):
-            print("did nothing")
-        else:
+        if(kPilesCounter[i]!=k):
             currentBool = False
-    print("current bool is "+str(currentBool))
-    print("zero ojbect pile counter is "+str(zeroObjectPileCounter))
-    print("zero object pile limit is "+str(zeroObjectPileLimit))
+
     if(zeroObjectPileLimit == zeroObjectPileCounter and currentBool):
-        print("the final condition was also met")
-
-
-    # if objectPileCounter == k and zeroObjectPileCounter == zeroObjectPileLimit:
-    #     print("this condition was met")
-
-
-
-    # if oneObjectPileCounter ==2 and twoObjectPileCounter==2 and zeroObjectPileCounter==zeroObjectPileLimit:
-    #     print("someoen won from the final condition ")
-
-
-
-
-
-
-
+        print(playerName + " lost the game")
 
 
 main()
