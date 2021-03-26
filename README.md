@@ -6,6 +6,19 @@ Project for CPSC-482
 	2. Then chooses a pile 
 	(not sure what should be the criteria to choose one {first pile, second pile…} {pile with most obj} etc.)
 	
+	For a standard game with only the first win condition:
+		X = 0
+		for each pile in list:
+			X = X xor pile
+			
+		for each pile in list:
+			if pile < X xor pile:
+				Choose this pile
+				break
+		
+		If it didn't find a pile, then it's losing.
+	
+	
 	3. After the pile n is chosen, take one object from it;   object count = 1 
 	4. Call check_function()        {returns TRUE or FALSE}
 		○ 4th condition
