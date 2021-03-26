@@ -8,6 +8,6 @@ def choosePile(pile_list):
         if pile < nim_sum ^ pile:
             return pile
 
-    return max(pile_list) # I don't know it this is optimal, 
+    return max(pile_list) # I don't know if this is optimal, 
                           # but it seems intuitive.
                           # Either way, you're losing at this point.
