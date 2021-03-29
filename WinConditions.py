@@ -1,3 +1,5 @@
+# Simple file containing some win condition presets
+
 RULE_1 = list()
 RULE_2 = [2, 2, 2]
 RULE_3 = [1, 2, 3]

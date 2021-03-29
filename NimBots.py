@@ -1,6 +1,29 @@
+import random
+
 from PlayerController import playerController
 
+# Simple bot that randomly picks a pile and amount
+#to take from said pile.
+class randomBot(playerController):
+
+    @staticmethod
+    def getDescription():
+        return "a random selection bot"
+
+    def playTurn(self, nim_instance):
+        pile_list = nim_instance.peek_list()
+        index = random.randrange(0, len(pile_list))
+        amount = random.randint(1, pile_list[index])
+
+        self.callback(self.name, nim_instance, (index, amount))
+
+# Bot designed to always win a 1v1 in a game with only the
+# first win condition whenever possible.    
 class standard1v1Bot(playerController):
+
+    @staticmethod
+    def getDescription():
+        return "a standard 1v1 bot"
 
     def playTurn(self, nim_instance):
         if(nim_instance.isMisere()):
@@ -10,6 +33,7 @@ class standard1v1Bot(playerController):
 
         self.callback(self.name, nim_instance, choice)
 
+    # If playing a standard game, bot will use this method to find its next move.
     def getStandardChoice(self, pile_list):
         nim_sum = 0
 
@@ -29,6 +53,7 @@ class standard1v1Bot(playerController):
         
         return (saved_index, 1)
 
+    # If playing a misere game, bot will use this method to find its next choice.
     def getMisereChoice(self, pile_list):
         large_piles = 0
         small_piles = 0
@@ -48,9 +73,3 @@ class standard1v1Bot(playerController):
 
         else:
             return self.getStandardChoice(pile_list)
-        
-
-        
-
-        
-
