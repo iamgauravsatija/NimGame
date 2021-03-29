@@ -7,23 +7,23 @@
 #         - call check function
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     
+# return pile index and count
 
-def getNextMove(given_list):
-    # create a local copy of list
-    local_list = given_list.copy()
+def choosePile(pile_list):
+    nim_sum = 0
 
-    # choose pile with maximum object
-    max_pile_count = max(local_list)
-    max_pile_index = local_list.index(max_pile_count)
+    for pile in pile_list:
+        nim_sum = nim_sum ^ pile
 
-    item_taken = 0
+    for pile in pile_list:
+        if pile < nim_sum ^ pile:
+            return pile
 
-    while item_taken >= max_pile_count:
-        item_taken += 1
-        is_valid = check_move(max_pile_index, max_pile_count - item_taken, local_list)
+    return max(pile_list) # I don't know if this is optimal, 
+                          # but it seems intuitive.
+                          # Either way, you're losing at this point.
 
-
-def check_move(pile_index, pile_objects_left, local_list):
+def check_move(pile_index, pile_objects_left, local_list, condition_dict):
     
     total_piles = len(local_list)
 
@@ -48,5 +48,35 @@ def check_move(pile_index, pile_objects_left, local_list):
     
     # condition 4
     # for this I need an array or a data structure which will tell n_i and m_j value:
-
+    # condition_dict represents condition 4 with:
+    #   size of dict = k
+    #   i -> key : value <=> ni : mi
+    #  
+    flag = True
+    for index in condition_dict:
+        pile_count, obj_count = index.split(":")
+        print(pile_count,"----", obj_count)
+        piles_local_list = local_list.count(obj_count)
+        if pile_count == piles_local_list:
+            flag = False
+            break
+    
+    if flag == True:
+        print("Loose conditon")
         
+
+def getNextMove(given_list, condition_dict):
+    # create a local copy of list
+    local_list = given_list.copy()
+
+    # choose pile with maximum object
+    max_pile_count = choosePile(local_list)
+    max_pile_index = local_list.index(max_pile_count)
+
+    item_taken = 0
+
+    while item_taken >= max_pile_count:
+        item_taken += 1
+        is_valid = check_move(max_pile_index, max_pile_count - item_taken, local_list)
+    
+    # add code to see what if all the moves were invalid and then just take one from max pile.
