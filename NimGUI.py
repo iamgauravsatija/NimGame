@@ -3,6 +3,7 @@ from tkinter import messagebox
 import re
 
 from PlayerController import playerController
+from Standard1V1Bot import standard1v1Bot
 import WinConditions as wincons
 from NimInstance import NimInstance
 
@@ -12,6 +13,8 @@ class nimApp(tk.Tk):
         self.title("Nim Game")
         self.start_frame = startFrame(master = self)
         self.option_frame = optionFrame(master = self)
+        self.load_frame = tk.Frame()
+        tk.Label(self.load_frame, text="...").pack()
         self.current_frame = self.start_frame
         self.current_frame.pack()
 
@@ -27,26 +30,43 @@ class nimApp(tk.Tk):
         player_list = self.start_frame.getPlayerList().copy()
 
         while(len(player_list) > 1):
-            game_round = NimInstance(game_settings[0].copy(), game_settings[1].copy())
+            game_round = NimInstance(game_settings[0].copy(), game_settings[1].copy(), game_settings[2])
             turn = -1
 
+            #Players altenate turns until a terminal condition is met.
             while not game_round.checkForWin():
                 turn = (turn + 1)%len(player_list)
                 self.block.set(True)
                 player_list[turn].playTurn(game_round)
                 self.wait_variable(self.block)
 
-            #Show defeat screen?
+            #Check if game is Misere or not. If not, last turn wins immediately
+            if not game_settings[2]:
+                player_list[0] = player_list[turn] #sets the last person to make a move to the front of the list
+                break #Once the loop is existed, front of the list wins.
+
+            #Otherwise, player to play last turn gets eliminated
+            if len(player_list) > 2:
+                self.block.set(True)
+                self.switchToTargetFrame(messageFrame(self, msg=player_list[turn].getName() + " was eliminated!", btn_msg="Ok", block=self.block, btn_callback_frame=self.load_frame))
+                self.wait_variable(self.block)
             if turn > -1:
                 player_list.pop(turn)
             else:
                 player_list.pop(0)
 
         #Show Victory Screen
-        self.switchToTargetFrame(messageFrame(self, msg=player_list[0].getName() + " wins!", btn_msg="Return", btn_callback_frame=self.start_frame))
+        self.switchToTargetFrame(messageFrame(self, msg=player_list[0].getName() + " wins!", btn_msg="Return", block=self.block, btn_callback_frame=self.start_frame))
 
     def humanTurn(self, name, nim_instance):
         self.switchToTargetFrame(playerChoiceFrame(self, name, nim_instance, self.playerChoice))
+
+    def botTurn(self, name, nim_instance, choice):
+        pile_list = nim_instance.peek_list()
+        plural = "s" if choice[1] > 1 else ""
+        nim_instance.takeFromPile(*choice)
+        self.switchToTargetFrame(botMessageFrame(self, msg=name + " took " + str(choice[1]) + " object" + plural + " from pile " + str(choice[0]+1), block=self.block, btn_callback_frame=self.load_frame, pile_list=pile_list, choice=choice))
+
 
     def playerChoice(self, nim_instance, pile_num, amount):
         nim_instance.takeFromPile(pile_num, amount)
@@ -72,8 +92,18 @@ class startFrame(tk.Frame):
         #Frame for adding bots
         self.bot_entry_frame = tk.LabelFrame(self, text="Add a bot")
         self.bot_entry_frame.grid(row = 1)
-        self.bot_button = tk.Button(self.bot_entry_frame, text="Add bot 1")
-        self.bot_button.pack()
+        self.bot_list = \
+        [\
+            tk.Button(self.bot_entry_frame, text="Add standard 1v1 bot", command = lambda: self.addBot(standard1v1Bot), state=tk.DISABLED)\
+        ] #<- add new bots to here
+        for bot in self.bot_list:
+            bot.pack()
+        
+        self.bot_entry_value = tk.StringVar()
+        self.bot_entry_value.trace_add("write", self.validateBotAdd)
+        tk.Label(self.bot_entry_frame, text="Bot Name:").pack(side=tk.LEFT)
+        self.bot_entry_field = tk.Entry(self.bot_entry_frame, textvariable=self.bot_entry_value)
+        self.bot_entry_field.pack(side=tk.LEFT)
 
         #Frame for viewing currently selected players
         self.player_view_frame = tk.LabelFrame(self, text="Current Players")
@@ -103,6 +133,14 @@ class startFrame(tk.Frame):
             self.name_entry_button["state"] = tk.DISABLED
         else:
             self.name_entry_button["state"] = tk.NORMAL
+    
+    def validateBotAdd(self, *args):
+        if len(self.bot_entry_value.get()) < 1:
+            for button in self.bot_list:
+                button["state"] = tk.DISABLED
+        else:
+            for button in self.bot_list:
+                button["state"] = tk.NORMAL
 
     def validatePlayerCount(self, *args):
         if self.player_count.get() < 1:
@@ -115,7 +153,12 @@ class startFrame(tk.Frame):
         self.player_list.append(pc)
         self.addPlayer(pc)
         self.name_entry_field.delete(0, tk.END)
-        
+
+    def addBot(self, bot_type):
+        pc = bot_type(self.bot_entry_value.get() + " bot", self.player_count.get(), self.parent.botTurn)
+        self.player_list.append(pc)
+        self.addPlayer(pc)
+        self.bot_entry_field.delete(0, tk.END)
 
     def addPlayer(self, pc):
         new_player_frame = tk.Frame(self.player_view_frame)
@@ -181,16 +224,24 @@ class optionFrame(tk.Frame):
         self.rule_button = tk.Button(self.rule_frame, text = "Add Rule", state = tk.DISABLED, command = self.ruleButtonPress)
         self.rule_button.grid(row=1, column=1)
 
-        #Control Buttons
         self.return_button = tk.Button(self, text="Return", command = lambda: self.parent.switchToTargetFrame(self.parent.start_frame))
-        self.return_button.grid(row = 1, column = 0)
+        self.return_button.grid(row = 2, columnspan=2, sticky=tk.E)
         self.pile_amount = tk.IntVar()
         self.pile_amount.set(0)
         self.pile_amount.trace_add("write", self.validateReturnButton)
-        #Default pile
-        self.addOption(self.pile_list_frame, 9, self.pile_list, decrement=True)
 
-        tk.Button(self, text="Add Defaults", command = self.addDefaults).grid(row=1, column=1)
+        #Default Pile
+        self.addOption(self.pile_list_frame, 9, self.pile_list, decrement=True) 
+
+        #Control Buttons
+        self.control_frame = tk.Frame(self)
+        self.control_frame.grid(row=1, columnspan=2)
+        self.game_type = tk.BooleanVar()
+        self.game_type.set(True)
+        tk.Radiobutton(self.control_frame, text="Misère", variable=self.game_type, value=True).grid(row=0, sticky=tk.W)
+        tk.Radiobutton(self.control_frame, text="Standard", variable=self.game_type, value=False).grid(row=0, column=1, sticky=tk.W)
+
+        tk.Button(self.control_frame, text="Add Defaults", command = self.addDefaults).grid(row=0, column=2, sticky=tk.E)
 
     def validatePileAdd(self, *args):
         if len(self.pile_value.get()) < 1:
@@ -258,20 +309,35 @@ class optionFrame(tk.Frame):
             self.return_button["state"] = tk.NORMAL
 
     def getSettings(self):
-        return (self.pile_list, self.rule_list)
+        return (self.pile_list, self.rule_list, self.game_type.get())
 
 class messageFrame(tk.Frame):
-    def __init__(self, master=None, msg="", btn_msg="Ok", btn_callback_frame=None):
+    def __init__(self, master=None, msg="", btn_msg="Ok", block=None, btn_callback_frame=None):
         tk.Frame.__init__(self, master)
 
         self.parent = master
 
         tk.Label(self, text=msg).pack()
-        tk.Button(self, text=btn_msg, command=lambda: self.button_callback(btn_callback_frame)).pack()
+        tk.Button(self, text=btn_msg, command=lambda: self.button_callback(block, btn_callback_frame)).pack()
 
-    def button_callback(self, btn_callback_frame):
+    def button_callback(self, block, btn_callback_frame):
         self.parent.switchToTargetFrame(btn_callback_frame)
+        block.set(False)
         self.destroy()
+
+class botMessageFrame(messageFrame):
+    def __init__(self, master=None, msg="", btn_msg="Ok", block=None, btn_callback_frame=None, pile_list=None, choice=None):
+        messageFrame.__init__(self, master=master, msg=msg, btn_msg=btn_msg, block=block, btn_callback_frame=btn_callback_frame)
+
+        pile_frame = tk.LabelFrame(self, text="Piles:")
+        pile_frame.pack(side=tk.BOTTOM)
+
+        for i in range(len(pile_list)):
+            tk.Label(pile_frame, text="Pile " + str(i+1) + ": " + str(pile_list[i])).grid(row=i, column=0)
+            if i == choice[0]:
+                tk.Label(pile_frame, text=" -" + str(choice[1]), fg="red").grid(row=i, column=1)
+
+
 
 class playerChoiceFrame(tk.Frame):
     def __init__(self, master, name, nim_instance, btn_callback):
@@ -313,7 +379,7 @@ class playerChoiceFrame(tk.Frame):
             self.select_button['state'] = tk.NORMAL
 
     def validateAmountEntry(self, text):
-        return text.isdigit() and int(text) > -1 and int(text) <= self.game_state[self.player_selection.get()]
+        return text.isdigit() and int(text) > 0 and int(text) <= self.game_state[self.player_selection.get()]
 
     def makeSelection(self):
         self.btn_callback(self.nim_instance, self.player_selection.get(), int(self.selection_amount.get()))
