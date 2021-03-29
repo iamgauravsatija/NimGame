@@ -3,6 +3,7 @@ from tkinter import messagebox
 import re
 
 from PlayerController import playerController
+from RandomBot import randomBot
 from Standard1V1Bot import standard1v1Bot
 import WinConditions as wincons
 from NimInstance import NimInstance
@@ -94,6 +95,7 @@ class startFrame(tk.Frame):
         self.bot_entry_frame.grid(row = 1)
         self.bot_list = \
         [\
+            tk.Button(self.bot_entry_frame, text="Add a random selection bot", command = lambda: self.addBot(randomBot), state=tk.DISABLED),\
             tk.Button(self.bot_entry_frame, text="Add standard 1v1 bot", command = lambda: self.addBot(standard1v1Bot), state=tk.DISABLED)\
         ] #<- add new bots to here
         for bot in self.bot_list:
