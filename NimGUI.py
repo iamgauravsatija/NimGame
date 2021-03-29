@@ -4,8 +4,7 @@ import re
 import importlib, inspect
 
 from PlayerController import playerController
-from RandomBot import randomBot
-from Standard1V1Bot import standard1v1Bot
+import NimBots
 import WinConditions as wincons
 from NimInstance import NimInstance
 
@@ -305,13 +304,13 @@ class optionFrame(tk.Frame):
             messagebox.showerror(title="Error!", message="Invalid input")
             return
 
-        self.addOption(self.rule_list_frame, new_rule, self.rule_list)
+        self.addOption(self.rule_list_frame, new_rule, self.rule_list, no_duplicates=True)
 
         self.rule_entry.delete(0, tk.END)
     
     # Updates gui and list in the corresponding targets
-    def addOption(self, target, option, target_list, removable = True, decrement = False):
-        if option in target_list:
+    def addOption(self, target, option, target_list, no_duplicates = False, removable = True, decrement = False):
+        if no_duplicates and option in target_list:
             return
         else:
             target_list.append(option)
@@ -336,7 +335,7 @@ class optionFrame(tk.Frame):
     # Adds the two default rules give by class (2, 2) and (1, 2, 3)
     def addDefaults(self):
         for next_rule in wincons.getDefaults():
-            self.addOption(self.rule_list_frame, next_rule, self.rule_list)
+            self.addOption(self.rule_list_frame, next_rule, self.rule_list, no_duplicates=True)
 
     # Deactivates the return to main menu button if the pile list is empty
     def validateReturnButton(self, *args):
