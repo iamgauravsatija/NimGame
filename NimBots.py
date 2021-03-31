@@ -103,7 +103,7 @@ class gauravTestBot(playerController):
         return max(pile_list) # I don't know if this is optimal, but it seems intuitive.
                               # Either way, you're losing at this point.
 
-    def check_move(self, pile_index, pile_objects_left, local_list, condition_list):
+    def checkMove(self, pile_index, pile_objects_left, local_list, condition_list):
         
         total_piles = len(local_list)
         new_list = local_list.copy()
@@ -160,7 +160,7 @@ class gauravTestBot(playerController):
 
         while item_taken >= target_pile_count and  is_valid == True:       
             item_taken += 1
-            is_valid = self.check_move(target_pile_index, target_pile_count - item_taken, local_list, condition_list)
+            is_valid = self.checkMove(target_pile_index, target_pile_count - item_taken, local_list, condition_list)
         
         item_taken = item_taken - 1
 
@@ -177,9 +177,9 @@ class gauravTestBot(playerController):
         return  target_pile_index, item_taken
 
     def playTurn(self, nim_instance):
-        self.callback(self.name, nim_instance, self.getNextMove(nim_instance.peek_list(), nim_instance.wincon_list))
+        self.callback(self.name, nim_instance, self.getNextMove(nim_instance.peek_list(), nim_instance.wincon_list)
 
-    
+                      
 class bruteForceBot(playerController):
 
     @staticmethod
@@ -389,3 +389,4 @@ class shortPredictionBot(playerController):
 
             # You lost; pick up the last object.
             return (0, 1)
+
