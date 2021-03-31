@@ -84,11 +84,11 @@ class standard1v1Bot(playerController):
 #         - call check function
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     
-class bot_v2 (playerController):
+class gauravTestBot(playerController):
     
     @staticmethod
     def getDescription():
-        return "bot_v2"
+        return "Gaurav's Testing Bot"
 
     def choosePile(self, pile_list):
         nim_sum = 0
@@ -103,7 +103,7 @@ class bot_v2 (playerController):
         return max(pile_list) # I don't know if this is optimal, but it seems intuitive.
                               # Either way, you're losing at this point.
 
-    def check_move(self, pile_index, pile_objects_left, local_list, condition_list):
+    def checkMove(self, pile_index, pile_objects_left, local_list, condition_list):
         
         total_piles = len(local_list)
         new_list = local_list.copy()
@@ -160,7 +160,7 @@ class bot_v2 (playerController):
 
         while item_taken >= target_pile_count and  is_valid == True:       
             item_taken += 1
-            is_valid = self.check_move(target_pile_index, target_pile_count - item_taken, local_list, condition_list)
+            is_valid = self.checkMove(target_pile_index, target_pile_count - item_taken, local_list, condition_list)
         
         item_taken = item_taken - 1
 
@@ -177,4 +177,216 @@ class bot_v2 (playerController):
         return  target_pile_index, item_taken
 
     def playTurn(self, nim_instance):
-        self.callback(self.name, nim_instance, self.getNextMove(nim_instance.peek_list(), nim_instance.wincon_list))
+        self.callback(self.name, nim_instance, self.getNextMove(nim_instance.peek_list(), nim_instance.wincon_list)
+
+                      
+class bruteForceBot(playerController):
+
+    @staticmethod
+    def getDescription():
+        return "a bot using brute force"
+
+    def playTurn(self, nim_instance):
+        self.callback(self.name, nim_instance, self.calculateMove(nim_instance))
+
+    # Checks all possible moves to determine whether the bot is 
+    # in a winning positions. If it is, it transitions
+    # to a new winning position. Otherwise, makes
+    # the first move it finds.
+    def calculateMove(self, nim_instance):
+        pile_list = nim_instance.peek_list()
+
+        for element in set(pile_list):
+            i = pile_list.index(element)
+            for k in range(element, 0, -1):
+                if self.isWinning(nim_instance.peekAfterTurn(i, k), False):
+                    return (i, k)
+
+        for element in set(pile_list):
+            i = pile_list.index(element)
+            for k in range(element, 0, -1):
+                if not nim_instance.peekAfterTurn(i, k).checkForWin():
+                    return (i, k)
+
+        return (0, 1)
+
+    # Uses recursion to determine if it is winning or not.
+    # if a chain of its own moves always wins against any set of moves
+    # the opponent can make, it is winning. Otherwise, it's losing.
+    def isWinning(self, nim_instance, my_turn):
+        if nim_instance.checkForWin():
+            return my_turn
+
+        for element in set(nim_instance.pile_list):
+            i = nim_instance.pile_list.index(element)
+            for k in range(element, 0, -1):
+                if self.isWinning(nim_instance.peekAfterTurn(i, k), not my_turn) == my_turn:
+                    return my_turn
+
+        return not my_turn
+
+class shortPredictionBot(playerController):
+
+    @staticmethod
+    def getDescription():
+        return "a bot that tries to predict the opponent"
+
+    def playTurn(self, nim_instance):
+        self.callback(self.name, nim_instance, self.makeChoice(nim_instance))
+
+    # Returns the nim sum of any number of piles
+    def getNimSum(self, *args):
+        nim_sum = 0
+
+        for pile in args:
+            nim_sum = nim_sum ^ pile
+
+        return nim_sum
+
+    # Returns a list of moves that result in a nim_sum of zero
+    def getZeroSumMoves(self, game_state):
+        result = list()
+
+        nim_sum = self.getNimSum(*game_state)
+
+        for index, pile in enumerate(game_state):
+            if nim_sum^pile < pile:
+                temp = (index, pile-(nim_sum^pile))
+                if temp not in result:
+                    result.append((index, pile-(nim_sum^pile)))
+
+        return result
+
+    # If this turn results in a losing state, this is
+    # considered a trap. Optimal play from a winning position
+    # will always be considered a trap.
+    def isTrap(self, nim_instance):
+        if nim_instance.checkForWin():
+            return False
+
+        large_piles = 0
+        small_piles = 0
+
+        for i, pile in enumerate(nim_instance.pile_list):
+            if pile > 1:
+                large_piles += 1
+                saved_index = i
+                if large_piles > 1:
+                    break
+            else:
+                small_piles += 1
+
+        if large_piles == 1:
+            if small_piles%2 == 1:
+                choice = (saved_index, nim_instance.pile_list[saved_index])
+            else:
+                choice = (saved_index, nim_instance.pile_list[saved_index]-1)
+
+            if nim_instance.peekAfterTurn(*choice).checkForWin():
+                return True
+            else:
+                return False
+        
+        for move in self.getZeroSumMoves(nim_instance.pile_list):
+            if not nim_instance.peekAfterTurn(*move).checkForWin():
+                return False
+
+        return True
+
+        
+    # Tries to determine optimal play and looks out for traps
+    # set by the enemy by looking one turn ahead.
+    def makeChoice(self, nim_instance):
+
+        large_piles = 0
+        small_piles = 0
+
+        # Check for the number of piles with more than one object
+        # Remember the number of piles with only one object
+        # in case we are in a late-game state.
+        for i, pile in enumerate(nim_instance.pile_list):
+            if pile > 1:
+                large_piles += 1
+                saved_index = i
+                if large_piles > 1:
+                    break
+            else:
+                small_piles += 1
+
+        # If there's only one pile with more than one object,
+        # the game is in late game, and the strategy changes.
+        if large_piles == 1:
+            if small_piles%2 == 1:
+                choice = (saved_index, nim_instance.pile_list[saved_index])
+            else:
+                choice = (saved_index, nim_instance.pile_list[saved_index]-1)
+
+            if not nim_instance.peekAfterTurn(*choice).checkForWin():
+                return choice
+
+        else:
+
+            # Look for zero sum moves to make, but watch out for potential enemy traps
+            for move in self.getZeroSumMoves(nim_instance.pile_list):
+                prediction = nim_instance.peekAfterTurn(*move)
+                
+                if prediction.checkForWin():
+                    continue
+                
+                is_viable = True
+
+                # Test all potential enemy moves on the next turn to see if
+                # they are a trap
+                for element in set(prediction.pile_list):
+                    index = prediction.pile_list.index(element)
+                    for k in range(element, 0 , -1):
+                        next_move = (index, k)
+                        enemy_state = prediction.peekAfterTurn(*next_move)
+
+                        if self.isTrap(enemy_state):
+                            is_viable = False
+                            break
+
+                # No traps were found, we can safely make a zero-sum move. 
+                if is_viable:
+                    return move
+
+            viable_moves = list()
+
+            # No moves that allow a zero sum exist, look to set a trap yourself.
+            for element in set(nim_instance.pile_list):
+                index = nim_instance.pile_list.index(element)
+                for k in range(element, 0, -1):
+                    next_move = (index, k)
+
+                    prediction = nim_instance.peekAfterTurn(*next_move)
+
+                    if prediction.checkForWin():
+                        continue
+                    
+                    if next_move not in viable_moves:
+                        viable_moves.append(next_move)
+
+                    if self.isTrap(prediction):
+                        return next_move             
+            
+            # No good moves to play; Play the viable move with the smallest difference
+            # In order to increase chances of winning.
+            if viable_moves:
+                greatest_difference = 0
+                saved_move = viable_moves[1]
+                
+                for move in viable_moves:
+
+                    current_difference = nim_instance.pile_list[move[0]]-move[1]
+
+                    if current_difference > greatest_difference:
+                        saved_move = move
+                        greatest_difference = current_difference
+
+                return saved_move
+
+
+            # You lost; pick up the last object.
+            return (0, 1)
+
