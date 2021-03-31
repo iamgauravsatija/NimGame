@@ -7,7 +7,7 @@
 <br>
 
 ## <b>Standard1v1Bot Analysis:</b>
-n represents the number of piles
+n represents the number of piles <br>
 m represents number of objects the pile with most objects has. <br>
 
 
@@ -23,7 +23,7 @@ Total Complexity is the sum of above three complexity.
 <br>
 
 ## <b>Bot_v2 Analysis:</b>
-n represents the number of piles
+n represents the number of piles <br>
 m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
