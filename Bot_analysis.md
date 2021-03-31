@@ -10,15 +10,12 @@
 n represents the number of piles
 m represents number of objects the pile with most objects has. <br>
 
-<Strong>Methods:</strong>
-n represents the number of piles
-m represents number of objects the pile with most objects has.
+
 <Strong>Methods:</strong>
 <br>
 1. getMisereChoice: O(n)
 2. getStandardChoice: O(n) + O(n) => O(n)
-3.  choosePile: O(n) + O(n) => O(n)
-<br>
+3. choosePile: O(n) + O(n) => O(n)
 
 Total Complexity is the sum of above three complexity.
 
