@@ -2,6 +2,8 @@ class NimInstance:
     def __init__(self, pile_list, wincon_list, is_misere=True):
         self.pile_list = pile_list
         self.wincon_list = wincon_list
+        for rule in self.wincon_list:
+            rule.sort()
         self.is_misere = is_misere
 
     # Takes (amount) objects from (pile_num) pile in 
@@ -20,10 +22,14 @@ class NimInstance:
     # Whether this results in a win or lose for player
     # is controlled by the game controller. Not this object.
     def checkForWin(self):
-        temp = sorted(self.pile_list)
+        return self.stateIsWin(self.pile_list)
+
+    # Returns true if the given state would result in termination
+    def stateIsWin(self, game_state):
+        game_state = sorted(game_state)
 
         for wincon in self.wincon_list:
-            if temp == wincon:
+            if game_state == wincon:
                 return True
 
         return False
@@ -40,5 +46,10 @@ class NimInstance:
     # Creates a copy of the instance. Currently unused.
     def copy(self):
         return NimInstance(self.pile_list.copy(), self.wincon_list)
+
+    def peekAfterTurn(self, pile_index, amount):
+        result = self.copy()
+        result.takeFromPile(pile_index, amount)
+        return result
 
         
