@@ -16,9 +16,7 @@ m represents number of objects the pile with most objects has.
 <Strong>Methods:</strong>
 <br>
 1. getMisereChoice: O(n)
-<br>
 2. getStandardChoice: O(n) + O(n) => O(n)
-<br> 
 3.  choosePile: O(n) + O(n) => O(n)
 <br>
 
@@ -32,11 +30,9 @@ n represents the number of piles
 m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
-1. check_move complexity: O(n) 
-<br>
+1. checkMove: O(n) 
 2. getNextMove: O(m)
-<br> 
-3.  choosePile: O(n) + O(n) => O(n)
+3. choosePile: O(n) + O(n) => O(n)
 
 Total Complexity is the sum of above three complexity.
 
