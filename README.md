@@ -96,7 +96,7 @@ Winning a game will display a victory screen with a single button. Pressing the 
 
 In this project are included several bots with varying strategies. These are included for testing and demonstration purposes. The implementation of all of these can be found in [`NimBots.py`](./NimBots.py)
 
-The bot that we have created specifically for this project is the [`shortPredictionBot`](), which is described as "a bot that tries to predict the opponent" in the GUI. This is the best performing bot in terms of the specifications given in class that has a reasonable execution time.
+The bot that we have created specifically for this project is the [`shortPredictionBot`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L228), which is described as "a bot that tries to predict the opponent" in the GUI. This is the best performing bot in terms of the specifications given in class that has a reasonable execution time.
 
 <br>
 
@@ -105,17 +105,17 @@ The bot that we have created specifically for this project is the [`shortPredict
 
 As the name suggests, this bot randomly generates a legal move. The accuracy of play is low, but the calcluation of its next move is fast and it is good for testing purposes.
 
-## [Standard 1v1 Bot](~linenum) <a name="std1v1bot"></a>
+## [Standard 1v1 Bot](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L22) <a name="std1v1bot"></a>
 
 This bot will always play optimally in a game where the only win condition is all heaps are empty. The performance cost is low, and it plays optimally in both normal and misère play. 
 
 Its only weaknesses are that it cannot account for other win conditions and it cannot account for a game with more than one other player.
 
-## [Gaurav's Test Bot]() <a name="testbotdesc"></a>
+## [Gaurav's Test Bot](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L87) <a name="testbotdesc"></a>
 
 This bot was made for testing purposes and selects a pile which it believes to be most optimal. It then checks every move it can make on that pile and searches for the best move.
 
-## [Brute Force Bot]() <a name="bruteforcedesc"></a>
+## [Brute Force Bot](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L183) <a name="bruteforcedesc"></a>
 
 This bot recursively checks all possible moves and game states through brute force to determine whether or not it is in a winning position. 
 
@@ -126,7 +126,7 @@ Recursion terminates immediately upon finding a single winning move, in which ca
 
 <text style="color:red"><Strong>Warning:</strong></text> Due to the brute-force nature of the algorithm, the calculation of moves is extremely costly and can cause the program to hang. Total object amounts of around 25 have shown to be slightly unresponsive, but manageable. Increasing the total object amount from there begins to increase the computation costs in drastic amounts. Use this bot with caution.
 
-## [Short Prediction Bot]() <a name="shortpredictdesc"></a>
+## [Short Prediction Bot](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L228) <a name="shortpredictdesc"></a>
 
 This bot is the best balance of performance cost and accuracy. The bot is designed to play 1v1's in misère play. 
 
@@ -326,13 +326,13 @@ m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
 <br>
-1. [getMisereChoice](): O(n)
-2. [getStandardChoice](): O(n) + O(n) => O(n)
-3. [choosePile](): O(n) + O(n) => O(n)
+1. [getStandardChoice](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L37): O(n) + O(n) => O(n)
+2. [getMisereChoice](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L57): O(n) + O(getStandardChoice) => O(n) + O(n) => O(n)
+3. [playTurn](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L28): O(1)
 
 Total Complexity is the sum of above three complexity.
 
-<b>Total Complexity: </b> O(n) + O(n) + O(n) = <b>O(n) </b>
+<b>Total Complexity: </b> O(n) + O(n) + O(1) = <b>O(n) </b>
 <br>
 
 ## <b>gauravTestingBot Analysis:</b>
@@ -340,9 +340,9 @@ n represents the number of piles <br>
 m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
-1. [checkMove](): O(n) 
-2. [getNextMove](): O(m)
-3. [choosePile](): O(n) + O(n) => O(n)
+1. [checkMove](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L93): O(n) 
+2. [getNextMove](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L150): O(m)
+3. [choosePile](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L93): O(n) + O(n) => O(n)
 
 Total Complexity is the sum of above three complexity.
 
@@ -355,14 +355,14 @@ n represents the number of piles <br>
 m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
-1. [getNimSum]():  O(n)
-2. [getZeroSumMoves](): O(n) + O(n) => O(n)
-3. [isTrap](): O(n) + O(n) => O(n)
-4. [makeChoice](): O(n) + O(n) + O(n) + O(n) => O(n)
+1. [getNimSum](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L238):  O(n)
+2. [getZeroSumMoves](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L247): O(n) + O(n) => O(n)
+3. [isTrap](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L263): O(n) + O(n) => O(n)
+4. [makeChoice](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L299): O(n) + O(n) + O(n*m) + O(n) => O(n)
 
 Total Complexity is the sum of mostly [makeChoice]() and [getZeroSumMoves]() complexity
 
-<b>Total Complexity: </b> O(n) + O(n) = <b>O(n) </b>
+<b>Total Complexity: </b> O(n) + O(n) = <b>O(n*m) </b>
 
 
 ---
@@ -375,21 +375,21 @@ Total Complexity is the sum of mostly [makeChoice]() and [getZeroSumMoves]() com
 
 A nim-sum is a mathematical concept used to determine whether a position is winning or losing in the game of Nim. In the Nim game it is known that if both players make no mistakes and the nim-sum at the beginning of the game is <b>not</b> zero, then the player starting is guaranteed to win. If the players make no mistakes and the nim sum at the beginning of the game <b>is</b> zero then the player who does not go first is guaranteed to win.
 
-The nim-sum is calculated by performing carryless binary addition on the size of all non-zero heaps. This is equivalent to bitwise-xor on the size of all heaps. It is known by the Sprague-Grundy theorem that a winning strategy in a misère game of Nim is to always end a move with a nim-sum of 0 until a certain condition is met. Our [`shortPredictionBot`]() uses this strategy, along with short-sighted forward prediction to inform itself of the next favorable move. 
+The nim-sum is calculated by performing carryless binary addition on the size of all non-zero heaps. This is equivalent to bitwise-xor on the size of all heaps. It is known by the Sprague-Grundy theorem that a winning strategy in a misère game of Nim is to always end a move with a nim-sum of 0 until a certain condition is met. Our [`shortPredictionBot`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L228) uses this strategy, along with short-sighted forward prediction to inform itself of the next favorable move. 
 
 ## Special Misère Condition <a name="specialwincon"></a>
 
 The known condition where one must change strategy in misère play to win, is where exactly one pile with a size greater than one exists. If this condition is met, the winning player must abandon the nim-sum strategy in order to create an odd number of piles of size one. This is because 1 is an odd number, and the player that begins a turn with only one pile of size one will lose. 
 
-Our [`shortPredictionBot`]() first checks for this special condition before attempting to create a nim-sum of zero. This guarantees that the bot follows optimal play when the only win condition is all empty piles.
+Our [`shortPredictionBot`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L228) first checks for this special condition before attempting to create a nim-sum of zero. This guarantees that the bot follows optimal play when the only win condition is all empty piles.
 
 ## Accounting for Additional Win Conditions <a name="otherwincons"></a>
 
-The [`shortPredictionBot`]() accounts for other win conditions, and can account for any general win condition, with the [`isTrap`]() method. A 'trap' in this case is defined as a move that results in a position that:
+The [`shortPredictionBot`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L228) accounts for other win conditions, and can account for any general win condition, with the [`isTrap`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L263) method. A 'trap' in this case is defined as a move that results in a position that:
 
 1. Does not lose for the player that performs it
 2. Does not create a state in which the next move can create a state which does not immediately lose and in which there is exactly one pile of size greater than one
 3. Does create a state in which the next move can create a state in which there is exactly one pile of size greater than one, but does immediately lose upon making it
 4. Creates a state in which it is not possible to achieve a nim-sum of zero without immediately losing. 
 
-By detecting 'traps' in advance, the bot can react to additional win conditions and adjust its strategy when normal play is no longer optimal. When the bot detects a potential trap, it will instead try to set a trap of its own, in order to gain an advantage over the opponent on the next turn. Although we were unable to prove that this bot will play optimally in every given position (unlike the [`bruteForceBot`]() which has a complexity too extereme to be viable) due to the short-sightedness of its predictions, it <b>will</b> play optimally in a large majority of positions, and can even regularly beat [`bruteForceBot`]() (which does play optimally in every position) when starting in a winning position.
+By detecting 'traps' in advance, the bot can react to additional win conditions and adjust its strategy when normal play is no longer optimal. When the bot detects a potential trap, it will instead try to set a trap of its own, in order to gain an advantage over the opponent on the next turn. Although we were unable to prove that this bot will play optimally in every given position (unlike the [`bruteForceBot`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L183) which has a complexity too extereme to be viable) due to the short-sightedness of its predictions, it <b>will</b> play optimally in a large majority of positions, and can even regularly beat [`bruteForceBot`](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L183) (which does play optimally in every position) when starting in a winning position.
