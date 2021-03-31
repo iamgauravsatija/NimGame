@@ -358,11 +358,11 @@ m represents number of objects the pile with most objects has. <br>
 1. [getNimSum](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L238):  O(n)
 2. [getZeroSumMoves](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L247): O(n) + O(n) => O(n)
 3. [isTrap](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L263): O(n) + O(n) => O(n)
-4. [makeChoice](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L299): O(n) + O(n) + O(n*m) + O(n) => O(n)
+4. [makeChoice](https://github.com/iamgauravsatija/NimGame/blob/main/NimBots.py#L299): O(n) + O(n) + O(n*m) + O(n) => O(m*n)
 
 Total Complexity is the sum of mostly [makeChoice]() and [getZeroSumMoves]() complexity
 
-<b>Total Complexity: </b> O(n) + O(n) = <b>O(n*m) </b>
+<b>Total Complexity: </b> O(m*n) + O(n) = <b>O(n*m) </b>
 
 
 ---
