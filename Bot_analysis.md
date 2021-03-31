@@ -3,6 +3,7 @@
 ## Content:
  * [standard1v1Bot Analysis](#standard1v1bot-analysis)
  * [bot_v2 Analysis](#bot_v2-analysis)
+ * [ShortPredictionBot Analysis](#shortPredictionBot-Analysis)
 
 <br>
 
@@ -34,3 +35,22 @@ m represents number of objects the pile with most objects has. <br>
 Total Complexity is the sum of above three complexity.
 
 <b>Total Complexity: </b> O(n) + O(m) + O(n) = <b>O(m + n) </b>
+<br>
+
+
+## <b>shortPredictionBot Analysis:</b>
+n represents the number of piles <br>
+m represents number of objects the pile with most objects has. <br>
+
+<Strong>Methods:</strong>
+1. getNimSum:  O(n)
+2. getZeroSumMoves: O(n) + O(n) => O(n)
+3. isTrap: O(n) + O(n) => O(n)
+4. makeChoice: O(n) + O(n) + O(n) + O(n) => O(n)
+
+Total Complexity is the sum of mostly makeChoice and getZeroSumMoves complexity
+
+<b>Total Complexity: </b> O(n) + O(n) = <b>O(n) </b>
+
+
+---
