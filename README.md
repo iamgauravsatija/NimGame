@@ -4,11 +4,18 @@
 
 * [Intro](#Intro)
 * [How to Use](#howtouse)
+* [About the Bots](#about-the-bots)
+	* [NimBots](#nimbots)
+		* [Random Bot](#randombot)
+		* [Standard 1v1 Bot](#std1v1bot)
+		* [Gaurav's Test Bot](#testbotdesc)
+		* [Brute Force Bot](#bruteforcedesc)
+		* [Short Prediction Bot](#shortpredictdesc)
 * [Documentation](#Documentation)
 	* [Main](#main)
 	* [NimInstance](#NimInstance)
 	* [PlayerController](#PlayerController)
-	* [NimBots](#NimBots)
+	* [NimBots](#nimbotdesc)
 	* [NimGUI](#NimGUI)
 	* [WinConditions](#WinConditions)
 * [Pseudocode](#Pseudocode)
@@ -19,6 +26,10 @@
 	* [standard1v1Bot Analysis](#standard1v1bot-analysis)
  	* [gauravTestingBot Analysis](#gauravTestingBot-analysis)
  	* [ShortPredictionBot Analysis](#shortPredictionBot-Analysis)
+* [Algorithm Correctness](#Algorithm-Correctness)
+	* [Nim Sums](#Nim-Sums)
+	* [Special Misère Condition](#specialwincon)
+	* [Accounting for Other Win Conditions](#otherwincons)
 
 ---
 
@@ -33,7 +44,7 @@ Project for CPSC-482 which contains a playable version of the Nim game with cust
 
 # How to Use <a name="howtouse"></a>
 
-Run `main.py` from the terminal or cmd. This will create a gui.
+Run [`main.py`](./main.py) from the terminal or cmd. This will create a gui.
 
 ![gui-image](./images/gui_main_menu.PNG)
 
@@ -65,7 +76,7 @@ These rules are:
 
 The `Return` button will bring you back to the Main Menu.
 
-Once a game of Nim has been started with the `Play!` button, the GUI will take turns waiting for the `PlayerController`s to supply it with their next move.
+Once a game of Nim has been started with the `Play!` button, the GUI will take turns waiting for the [`PlayerController`](#PlayerController)s to supply it with their next move.
 
 Bots will generate moves automatically and inform the user of their move with a message screen. Simply press the `Ok` button to advance to the next turn. 
 
@@ -73,7 +84,7 @@ Human players will be prompted with a move selection screen:
 
 ![player-move-image](./images/gui_player_move.PNG)
 
-The `RadioButton` is used to select which pile to take from. Select the pile you wish to take from and then enter the amount into the entry below. This entry will only accept digits between 1 (inclusive) and the size of the currently selected pile. Once you have entered the amount and pressed the `Take` button, the GUI will inform the `NimInstance` of your move and proceed.
+The `RadioButton` is used to select which pile to take from. Select the pile you wish to take from and then enter the amount into the entry below. This entry will only accept digits between 1 (inclusive) and the size of the currently selected pile. Once you have entered the amount and pressed the `Take` button, the GUI will inform the [`NimInstance`](#NimInstance) of your move and proceed.
 
 Winning a game will display a victory screen with a single button. Pressing the button will return you to the Main Menu, where you can decide to play again, change the players or rules, or exit the application.
 
@@ -81,31 +92,77 @@ Winning a game will display a victory screen with a single button. Pressing the 
 
 <br>
 
+# About the Bots
+
+In this project are included several bots with varying strategies. These are included for testing and demonstration purposes. The implementation of all of these can be found in [`NimBots.py`](./NimBots.py)
+
+The bot that we have created specifically for this project is the [`shortPredictionBot`](), which is described as "a bot that tries to predict the opponent" in the GUI. This is the best performing bot in terms of the specifications given in class that has a reasonable execution time.
+
+<br>
+
+# [NimBots](./NimBots.py) <a name="nimbotdesc"></a>
+## [Random Bot](linenum) <a name="randombot"></a>
+
+As the name suggests, this bot randomly generates a legal move. The accuracy of play is low, but the calcluation of its next move is fast and it is good for testing purposes.
+
+## [Standard 1v1 Bot](~linenum) <a name="std1v1bot"></a>
+
+This bot will always play optimally in a game where the only win condition is all heaps are empty. The performance cost is low, and it plays optimally in both normal and misère play. 
+
+Its only weaknesses are that it cannot account for other win conditions and it cannot account for a game with more than one other player.
+
+## [Gaurav's Test Bot]() <a name="testbotdesc"></a>
+
+This bot was made for testing purposes and selects a pile which it believes to be most optimal. It then checks every move it can make on that pile and searches for the best move.
+
+## [Brute Force Bot]() <a name="bruteforcedesc"></a>
+
+This bot recursively checks all possible moves and game states through brute force to determine whether or not it is in a winning position. 
+
+This is determined by whether or not there exists a move in which no matter what move the enemy makes, the bot will remain in a winning position. This is then defined recursively, where the base case for a winning position is the position in which the bot cannot make another turn (this definition only works for misère play).
+
+Recursion terminates immediately upon finding a single winning move, in which case the bot plays it. If the bot is not in a winning postion (i.e. cannot find a winning move) it will play the first move it finds that does not immediately lose the game. If that cannot be found, then it will take one object from the first (only) pile.
+
+
+<text style="color:red"><Strong>Warning:</strong></text> Due to the brute-force nature of the algorithm, the calculation of moves is extremely costly and can cause the program to hang. Total object amounts of around 25 have shown to be slightly unresponsive, but manageable. Increasing the total object amount from there begins to increase the computation costs in drastic amounts. Use this bot with caution.
+
+## [Short Prediction Bot]() <a name="shortpredictdesc"></a>
+
+This bot is the best balance of performance cost and accuracy. The bot is designed to play 1v1's in misère play. 
+
+This bot works by playing optimally as if it were playing a standard Nim game, but looks ahead to avoid extra win conditions and enemy moves which may gain an advantage.
+
+The algorithm and correctness is discussed further in [`Algorithm Correctness`](#algorithm-correctness)
+
+---
+
+<br>
+
 # Documentation
 
-## main
+## [main](./main.py)
 
 Simple entry point for program. Runs a GUI.
 
-## NimInstance
+## [NimInstance](./NimInstance.py)
 
 A class used to store and manipulate information on an instance of a game of Nim, such as the piles and the objects that are currently in said piles.
 
 Stores win conditions as a list of lists. This allows any various win states to be added and checked against when playing.
 
-## PlayerController
+## [PlayerController](./PlayerController.py)
 
 An 'abstract' class which is used as a controller for players in a game of Nim. Is used as a super class for bots. Takes a callback method which can be used to determine what happens when it is this controller's turn to play.
 
-## NimBots
+## [NimBots](./NimBots.py)
 
-Contains various classes that inherit the `PlayerController` class. These classes are designed to programmatically generate decisions on what move to make in a game of Nim, based on the current state of the piles. Any new class added to this file is automatically constructed as a bot option in the GUI.
+Contains various classes that inherit the [`PlayerController`](./PlayerController.py) class. These classes are designed to programmatically generate decisions on what move to make in a game of Nim, based on the current state of the piles. Any new class added to this file is automatically constructed as a bot option in the GUI.
 
-## NimGUI
+## [NimGUI](./NimGUI.py)
 
 Contains the logic and controllers for the GUI. Also controls the order and flow of a Nim game, stores settings for a Nim game to be created, and contains a 'bot factory', for automatically creating instances of bot classes found in `NimBots.py`.
 
-## WinConditions
+## [WinConditions](./WinConditions.py)
 
 Contains 'constants' for the default win conditions that will be used in class for convenience.
 
@@ -269,9 +326,9 @@ m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
 <br>
-1. getMisereChoice: O(n)
-2. getStandardChoice: O(n) + O(n) => O(n)
-3. choosePile: O(n) + O(n) => O(n)
+1. [getMisereChoice](): O(n)
+2. [getStandardChoice](): O(n) + O(n) => O(n)
+3. [choosePile](): O(n) + O(n) => O(n)
 
 Total Complexity is the sum of above three complexity.
 
@@ -283,9 +340,9 @@ n represents the number of piles <br>
 m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
-1. checkMove: O(n) 
-2. getNextMove: O(m)
-3. choosePile: O(n) + O(n) => O(n)
+1. [checkMove](): O(n) 
+2. [getNextMove](): O(m)
+3. [choosePile](): O(n) + O(n) => O(n)
 
 Total Complexity is the sum of above three complexity.
 
@@ -298,14 +355,41 @@ n represents the number of piles <br>
 m represents number of objects the pile with most objects has. <br>
 
 <Strong>Methods:</strong>
-1. getNimSum:  O(n)
-2. getZeroSumMoves: O(n) + O(n) => O(n)
-3. isTrap: O(n) + O(n) => O(n)
-4. makeChoice: O(n) + O(n) + O(n) + O(n) => O(n)
+1. [getNimSum]():  O(n)
+2. [getZeroSumMoves](): O(n) + O(n) => O(n)
+3. [isTrap](): O(n) + O(n) => O(n)
+4. [makeChoice](): O(n) + O(n) + O(n) + O(n) => O(n)
 
-Total Complexity is the sum of mostly makeChoice and getZeroSumMoves complexity
+Total Complexity is the sum of mostly [makeChoice]() and [getZeroSumMoves]() complexity
 
 <b>Total Complexity: </b> O(n) + O(n) = <b>O(n) </b>
 
 
 ---
+
+<br>
+
+# Algorithm Correctness
+
+## Nim sums
+
+A nim-sum is a mathematical concept used to determine whether a position is winning or losing in the game of Nim. In the Nim game it is known that if both players make no mistakes and the nim-sum at the beginning of the game is <b>not</b> zero, then the player starting is guaranteed to win. If the players make no mistakes and the nim sum at the beginning of the game <b>is</b> zero then the player who does not go first is guaranteed to win.
+
+The nim-sum is calculated by performing carryless binary addition on the size of all non-zero heaps. This is equivalent to bitwise-xor on the size of all heaps. It is known by the Sprague-Grundy theorem that a winning strategy in a misère game of Nim is to always end a move with a nim-sum of 0 until a certain condition is met. Our [`shortPredictionBot`]() uses this strategy, along with short-sighted forward prediction to inform itself of the next favorable move. 
+
+## Special Misère Condition <a name="specialwincon"></a>
+
+The known condition where one must change strategy in misère play to win, is where exactly one pile with a size greater than one exists. If this condition is met, the winning player must abandon the nim-sum strategy in order to create an odd number of piles of size one. This is because 1 is an odd number, and the player that begins a turn with only one pile of size one will lose. 
+
+Our [`shortPredictionBot`]() first checks for this special condition before attempting to create a nim-sum of zero. This guarantees that the bot follows optimal play when the only win condition is all empty piles.
+
+## Accounting for Additional Win Conditions <a name="otherwincons"></a>
+
+The [`shortPredictionBot`]() accounts for other win conditions, and can account for any general win condition, with the [`isTrap`]() method. A 'trap' in this case is defined as a move that results in a position that:
+
+1. Does not lose for the player that performs it
+2. Does not create a state in which the next move can create a state which does not immediately lose and in which there is exactly one pile of size greater than one
+3. Does create a state in which the next move can create a state in which there is exactly one pile of size greater than one, but does immediately lose upon making it
+4. Creates a state in which it is not possible to achieve a nim-sum of zero without immediately losing. 
+
+By detecting 'traps' in advance, the bot can react to additional win conditions and adjust its strategy when normal play is no longer optimal. When the bot detects a potential trap, it will instead try to set a trap of its own, in order to gain an advantage over the opponent on the next turn. Although we were unable to prove that this bot will play optimally in every given position (unlike the [`bruteForceBot`]() which has a complexity too extereme to be viable) due to the short-sightedness of its predictions, it <b>will</b> play optimally in a large majority of positions, and can even regularly beat [`bruteForceBot`]() (which does play optimally in every position) when starting in a winning position.

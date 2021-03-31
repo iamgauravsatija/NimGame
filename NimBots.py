@@ -177,7 +177,7 @@ class gauravTestBot(playerController):
         return  target_pile_index, item_taken
 
     def playTurn(self, nim_instance):
-        self.callback(self.name, nim_instance, self.getNextMove(nim_instance.peek_list(), nim_instance.wincon_list)
+        self.callback(self.name, nim_instance, self.getNextMove(nim_instance.peek_list(), nim_instance.wincon_list))
 
                       
 class bruteForceBot(playerController):
